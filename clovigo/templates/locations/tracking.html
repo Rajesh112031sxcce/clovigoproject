@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Live Order Location</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map {
+      height: 400px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <h2>Order Live Location</h2>
+  <div id="map"></div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <script>
+    // Example location (you can replace with values from Django API)
+    const latitude = 12.9716;
+    const longitude = 77.5946;
+
+    // Initialize the map
+    const map = L.map('map').setView([latitude, longitude], 13);
+
+    // Add the tile layer from OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Add marker for current location
+    const marker = L.marker([latitude, longitude]).addTo(map)
+      .bindPopup("Delivery Location").openPopup();
+
+      setInterval(() => {
+  fetch('/api/orders/123/location/')
+    .then(res => res.json())
+    .then(data => {
+      const { latitude, longitude } = data;
+      marker.setLatLng([latitude, longitude]);
+      map.setView([latitude, longitude]);
+    });
+}, 10000);  // updates every 10 seconds
+  </script>
+</body>
+</html>
